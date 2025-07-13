@@ -129,7 +129,7 @@ let webe = {
             return i; // return the number of blocks affected
         },
         replace: function(pos1, pos2, from, to, dimension=s.world.getDimension('minecraft:overworld')) {
-            to = webe.methods.parse_pattern(pattern)
+            to = webe.methods.parse_pattern(to)
             let
                 x1 = Math.min(pos1.x, pos2.x),
                 y1 = Math.min(pos1.y, pos2.y),
@@ -1147,13 +1147,11 @@ let webe = {
     on_tick: function() {
         s.system.runInterval(() => {
             // runs every game tick
-
-            
         })
     },
     on_load: function() {
         // runs when the script is loaded
-        s.world.sendMessage(`script reloaded!`);
+        s.world.sendMessage(`\xa7eWorldEdit-BE \xa7f- \xa7eScript reloaded\xa7f!`);
     }
 }
 s.system.beforeEvents.watchdogTerminate.subscribe(e => {
