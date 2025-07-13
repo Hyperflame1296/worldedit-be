@@ -1,0 +1,46 @@
+{
+    "format_version": 2,
+    "header": {
+        "name": "bp - worldedit-be",
+        "description": "i want to make a port of java's worldedit to bedrock.",
+        "uuid": "fc8d04c3-e8f0-44ee-b2e7-5079bf56b389",
+        "version": [ 0, 1, 0 ],
+        "min_engine_version": [ 1, 21, 90 ]
+    },
+    "modules": [
+        {
+            "description": "bp0.1.0",
+            "type": "data",
+            "uuid": "3cf8d749-305f-4f89-95c3-858bcc298c19",
+            "version": [ 0, 1, 0 ]
+        },
+        {
+            "description": "bp0.1.0",
+            "type": "script",
+            "uuid": "4a99cc8e-c5cf-4e51-bd75-659026452fe1",
+            "version": [ 0, 1, 0 ],
+            "entry": "scripts/webe/main.js"
+        }
+    ],
+    "capabilities": [
+        "script_eval"
+    ],
+    "dependencies": [
+        {
+            "module_name": "@minecraft/server",
+            "version": "2.1.0-beta"
+        },
+        {
+            "module_name": "@minecraft/server-ui",
+            "version": "2.1.0-beta"
+        },
+        {
+            "module_name": "@minecraft/server-gametest",
+            "version": "1.0.0-beta"
+        }
+    ],
+    "metadata": {
+        "authors": [ "TensiveYT" ],
+        "url": "https://www.youtube.com/channel/UCcLEP9PTEppqLgSlMPQfjDQ"
+    }
+}
