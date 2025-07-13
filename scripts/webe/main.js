@@ -509,7 +509,7 @@ let webe = {
                         z: !e || e === '' ? Math.floor(player.location.z) : parseInt(e)
                     }
                     player.setDynamicProperty('webe:pos1', npos);
-                    player.sendMessage(`\xa7eFirst position set to \xa7f(\xa7e${npos.x}\xa7f, \xa7e${npos.y}\xa7f, \xa7e${npos.z}\xa7f)${player.getDynamicProperty('webe:pos1') ? ' \xa7f(\xa7e' + webe.methods.area(player.getDynamicProperty('webe:pos2'), npos) + '\xa7f)' : ''}.`);
+                    player.sendMessage(`\xa7eFirst position set to \xa7f(\xa7e${npos.x}\xa7f, \xa7e${npos.y}\xa7f, \xa7e${npos.z}\xa7f).`);
                 } catch (e) {
                     player.sendMessage(`\xa7cERROR \xa7f- \xa7c${e.message}`); // send an error message to the player
                 }
@@ -1128,7 +1128,7 @@ let webe = {
                         e.cancel = true; // cancel the block break event
                         if (s.system.currentTick - (player.getDynamicProperty('webe:last_set') ?? 0) < 10) return; // if the player is on cooldown, do nothing
                         player.setDynamicProperty('webe:pos1', e.block.location); // set the first position to the block location
-                        player.sendMessage(`\xa7eFirst position set to \xa7f(\xa7e${e.block.location.x}\xa7f, \xa7e${e.block.location.y}\xa7f, \xa7e${e.block.location.z}\xa7f)${player.getDynamicProperty('webe:pos2') ? ' \xa7f(\xa7e' + webe.methods.area(player.getDynamicProperty('webe:pos2'), e.block.location) + '\xa7f)' : ''}.`);
+                        player.sendMessage(`\xa7eFirst position set to \xa7f(\xa7e${e.block.location.x}\xa7f, \xa7e${e.block.location.y}\xa7f, \xa7e${e.block.location.z}\xa7f).`);
                         player.setDynamicProperty('webe:last_set', s.system.currentTick); // set a cooldown
                     }
                 }
