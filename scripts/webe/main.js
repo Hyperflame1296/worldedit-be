@@ -1154,7 +1154,9 @@ let webe = {
         after_events: {
             playerSpawn: function(e) {
                 // runs when a player spawns
-
+                if (e.initialSpawn && e.player.commandPermissionLevel >= 2) {
+                    e.player.sendMessage(`\xa7eWelcome\xa7f! \xa7eType \xa7f${webe.command_prefix}\xa7ehelp to see WorldEdit commands\xa7f!`)
+                }
             }
         }
     },
