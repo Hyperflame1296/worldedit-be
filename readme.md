@@ -1,3 +1,3 @@
-# ncb-template
-template, for making mods using ncb
-this is mostly for myself, and it makes creating mods & stuff easier
+# worldedit-be
+i want to make a port of java's WorldEdit to bedrock edition
+cuz im bored, and also building manually is slow, and /fill sucks
