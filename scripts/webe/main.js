@@ -31,20 +31,33 @@ let webe = {
         },
         random_entries(entries) {
             let total = 0;
-            let cumulative = entries.map(([chance, value]) => {
-                total += chance;
-                return [total, value];
-            });
-          
-            if (total <= 0) throw new Error('webe.methods.random_entries \xa7f-\xa7c Total chance must be greater than 0. All entries provided had a chance of 0 or less.');
-          
-            let roll = Math.random() * total;
-          
-            for (let [threshold, value] of cumulative) {
-                if (roll < threshold) return value;
+            const thresholds = new Float64Array(entries.length); // Faster than array of arrays
+            const values = new Array(entries.length);
+
+            for (let i = 0; i < entries.length; i++) {
+                total += entries[i][0];
+                thresholds[i] = total;
+                values[i] = entries[i][1];
             }
-          
-            return cumulative[cumulative.length - 1][1]; // fallback
+
+            if (total <= 0) throw new Error('webe.methods.random_entries §f-§c Total chance must be greater than 0.');
+
+            const roll = Math.random() * total;
+
+            // Binary search for faster lookup in large datasets
+            let low = 0;
+            let high = thresholds.length - 1;
+
+            while (low < high) {
+                const mid = (low + high) >> 1;
+                if (roll < thresholds[mid]) {
+                    high = mid;
+                } else {
+                    low = mid + 1;
+                }
+            }
+
+            return values[low];
         },
         equal_random(entries) {
             if (!entries.length) throw new Error('webe.methods.parse_pattern \xa7f-\xa7c No input strings were provided\xa7f.');
@@ -166,6 +179,11 @@ let webe = {
         },
         sphere: function(c, r, pattern, dimension, h = false) {
             pattern = webe.methods.parse_pattern(pattern)
+            c = {
+                x: Math.floor(c.x),
+                y: Math.floor(c.y),
+                z: Math.floor(c.z)
+            }
             let rs = r ** 2;
             let rs2 = (r - 1) ** 2;
             let i = 0;
@@ -196,6 +214,11 @@ let webe = {
         },
         cyl: function(c, r, height, pattern, dimension, h = false) {
             pattern = webe.methods.parse_pattern(pattern)
+            c = {
+                x: Math.floor(c.x),
+                y: Math.floor(c.y),
+                z: Math.floor(c.z)
+            }
             let rs = r ** 2;
             let rs2 = (r - 1) ** 2;
             let i = 0;
@@ -226,6 +249,11 @@ let webe = {
         },
         pyramid: function(c, r, pattern, dimension, h = false) {
             pattern = webe.methods.parse_pattern(pattern)
+            c = {
+                x: Math.floor(c.x),
+                y: Math.floor(c.y),
+                z: Math.floor(c.z)
+            }
             if (r < 1) return 0;
             let i = 0;
             let pos = { x: 0, y: 0, z: 0 }; // reuse, reduce, recycle
@@ -253,6 +281,11 @@ let webe = {
             return i;
         },
         fix_water: function(c, r, dimension) {
+            c = {
+                x: Math.floor(c.x),
+                y: Math.floor(c.y),
+                z: Math.floor(c.z)
+            }
             let rs = r ** 2;
             let rs2 = (r - 1) ** 2;
             let i = 0;
@@ -285,6 +318,11 @@ let webe = {
             return i;
         },
         fix_lava: function(c, r, dimension) {
+            c = {
+                x: Math.floor(c.x),
+                y: Math.floor(c.y),
+                z: Math.floor(c.z)
+            }
             let rs = r ** 2;
             let rs2 = (r - 1) ** 2;
             let i = 0;
@@ -317,6 +355,11 @@ let webe = {
             return i;
         },
         drain: function(c, r, dimension, w=false) {
+            c = {
+                x: Math.floor(c.x),
+                y: Math.floor(c.y),
+                z: Math.floor(c.z)
+            }
             let rs = r ** 2;
             let rs2 = (r - 1) ** 2;
             let i = 0;
@@ -354,6 +397,11 @@ let webe = {
             return i;
         },
         replacenear: function(c, r, dimension, from, to) {
+            c = {
+                x: Math.floor(c.x),
+                y: Math.floor(c.y),
+                z: Math.floor(c.z)
+            }
             to = webe.methods.parse_pattern(to)
             let i = 0;
             for (let x = -r; x <= r; x++) {
