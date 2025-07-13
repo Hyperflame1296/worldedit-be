@@ -47,7 +47,9 @@ let webe = {
         parse_pattern: function(pattern) {
             // parse the pattern
             pattern = pattern.trim()
-            if (pattern.includes(',')) {
+            if (pattern === '*')
+                return () => webe.all_blocks[Math.floor(Math.random() * webe.all_blocks.length)]
+            else if (pattern.includes(',')) {
                 let blocks = pattern.split(',').map(b => b.trim());
                 let types = blocks.map(b => {
                     if (b.includes('%')) {
@@ -78,7 +80,7 @@ let webe = {
                 }
             }
         },
-        setblock: function(pos, pattern, dimension=s.world.getDimension('minecraft:overworld')) {
+        setblock: function(pos, pattern, dimension) {
             let p = pattern;
             if (pos.y < -64 || pos.y > 319) return 0;
             let b = dimension.getBlock(pos);
@@ -89,7 +91,7 @@ let webe = {
             }
             return 0;
         },
-        fill: function(pos1, pos2, pattern, dimension=s.world.getDimension('minecraft:overworld')) {
+        fill: function(pos1, pos2, pattern, dimension) {
             pattern = webe.methods.parse_pattern(pattern)
             let
                 x1 = Math.min(pos1.x, pos2.x),
@@ -109,7 +111,7 @@ let webe = {
 
             return i; // return the number of blocks affected
         },
-        del: function(pos1, pos2, dimension=s.world.getDimension('minecraft:overworld')) {
+        del: function(pos1, pos2, dimension) {
             let
                 x1 = Math.min(pos1.x, pos2.x),
                 y1 = Math.min(pos1.y, pos2.y),
@@ -128,7 +130,7 @@ let webe = {
 
             return i; // return the number of blocks affected
         },
-        replace: function(pos1, pos2, from, to, dimension=s.world.getDimension('minecraft:overworld')) {
+        replace: function(pos1, pos2, from, to, dimension) {
             to = webe.methods.parse_pattern(to)
             let
                 x1 = Math.min(pos1.x, pos2.x),
@@ -146,7 +148,7 @@ let webe = {
                     for (let z = z1; z <= z2; z++) {
                         if (y < -64 || y > 319) continue;
                         let b = dimension.getBlock({x, y, z});
-                        if (b && s.BlockTypes.get(b.type.id) === s.BlockTypes.get(from))
+                        if (b && (s.BlockTypes.get(b.type.id) === s.BlockTypes.get(from)))
                             i += this.setblock({x, y, z}, to, dimension); // increment the Blocks Affected counter
                         else continue;
                     }
@@ -155,7 +157,7 @@ let webe = {
 
             return i; // return the number of blocks affected
         },
-        sphere: function(c, r, pattern, dimension=s.world.getDimension('minecraft:overworld'), h = false) {
+        sphere: function(c, r, pattern, dimension, h = false) {
             pattern = webe.methods.parse_pattern(pattern)
             let rs = r ** 2;
             let rs2 = (r - 1) ** 2;
@@ -187,7 +189,7 @@ let webe = {
             }
             return i;
         },
-        cyl: function(c, r, height, pattern, dimension=s.world.getDimension('minecraft:overworld'), h = false) {
+        cyl: function(c, r, height, pattern, dimension, h = false) {
             pattern = webe.methods.parse_pattern(pattern)
             let rs = r ** 2;
             let rs2 = (r - 1) ** 2;
@@ -219,7 +221,7 @@ let webe = {
             }
             return i;
         },
-        pyramid: function(c, r, pattern, dimension=s.world.getDimension('minecraft:overworld'), h = false) {
+        pyramid: function(c, r, pattern, dimension, h = false) {
             pattern = webe.methods.parse_pattern(pattern)
             if (r < 1) return 0;
             let i = 0;
@@ -251,7 +253,7 @@ let webe = {
 
             return i;
         },
-        fix_water: function(c, r, dimension=s.world.getDimension('minecraft:overworld')) {
+        fix_water: function(c, r, dimension) {
             let rs = r ** 2;
             let rs2 = (r - 1) ** 2;
             let i = 0;
@@ -283,7 +285,7 @@ let webe = {
             }
             return i;
         },
-        fix_lava: function(c, r, dimension=s.world.getDimension('minecraft:overworld')) {
+        fix_lava: function(c, r, dimension) {
             let rs = r ** 2;
             let rs2 = (r - 1) ** 2;
             let i = 0;
@@ -315,7 +317,7 @@ let webe = {
             }
             return i;
         },
-        drain: function(c, r, dimension=s.world.getDimension('minecraft:overworld'), w=false) {
+        drain: function(c, r, dimension, w=false) {
             let rs = r ** 2;
             let rs2 = (r - 1) ** 2;
             let i = 0;
@@ -352,7 +354,7 @@ let webe = {
             }
             return i;
         },
-        replacenear: function(c, r, dimension=s.world.getDimension('minecraft:overworld'), from, to) {
+        replacenear: function(c, r, dimension, from, to) {
             to = webe.methods.parse_pattern(to)
             let i = 0;
             for (let x = -r; x <= r; x++) {
@@ -360,8 +362,9 @@ let webe = {
                     for (let z = -r; z <= r; z++) {
                         if (c.y + y < -64 || c.y + y > 319) continue;
                         let b = dimension.getBlock({x: c.x + x, y: c.y + y, z: c.z + z});
-                        if (b && s.BlockTypes.get(b.type.id) === s.BlockTypes.get(from))
+                        if (b && (s.BlockTypes.get(b.type.id) === s.BlockTypes.get(from)))
                             i += this.setblock({x: c.x + x, y: c.y + y, z: c.z + z}, to, dimension); // increment the Blocks Affected counter
+                        else continue;
                     }
                 }
             }
@@ -1160,6 +1163,7 @@ s.system.beforeEvents.watchdogTerminate.subscribe(e => {
     s.world.sendMessage(`\xa7coh god, the server almost died\xa7r\n    \xa7c${e.terminateReason}`)
 })
 s.world.afterEvents.worldLoad.subscribe(() => {
+    webe.all_blocks = s.BlockTypes.getAll();
     for (let key of Object.keys(webe.listeners.before_events)) {
         s.world.beforeEvents[key].subscribe(webe.listeners.before_events[key]);
     }
