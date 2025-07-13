@@ -440,7 +440,7 @@ let webe = {
         },
         {
             name: 'deselect',
-            desc: 'Deselects the current region selection.',
+            desc: 'Deselects the current region.',
             syntax: [
                 '#\xa7edeselect',
             ],
@@ -456,7 +456,7 @@ let webe = {
                         player.setDynamicProperty('webe:pos2', undefined); // clear the second position
                         player.sendMessage(`\xa7eSelection cleared\xa7f.`);
                     } else {
-                        player.sendMessage(`\xa7cMake a region selection first\xa7f.`);
+                        player.sendMessage(`\xa7cSelect a region first\xa7f.`);
                     }
                 } catch (e) {
                     player.sendMessage(`\xa7cERROR \xa7f- \xa7c${e.message}`); // send an error message to the player
@@ -465,7 +465,7 @@ let webe = {
         },
         {
             name: 'pos1',
-            desc: 'Set position 1.',
+            desc: 'Sets the first position.',
             syntax: [
                 '#\xa7epos1 \xa7i[\xa7fx\xa7i] \xa7i[\xa7fy\xa7i] \xa7i[\xa7fz\xa7i]',
             ],
@@ -517,7 +517,7 @@ let webe = {
         },
         {
             name: 'pos2',
-            desc: 'Set position 2.',
+            desc: 'Sets the second position.',
             syntax: [
                 '#\xa7epos2 \xa7i[\xa7fx\xa7i] \xa7i[\xa7fy\xa7i] \xa7i[\xa7fz\xa7i]',
             ],
@@ -568,7 +568,7 @@ let webe = {
         },
         {
             name: 'wand',
-            desc: 'Get the wand item.',
+            desc: 'Gives you the wand item.',
             syntax: [
                 '#\xa7dwand',
             ],
@@ -597,7 +597,7 @@ let webe = {
         },
         {
             name: 'up',
-            desc: 'Go upwards some distance.',
+            desc: 'Teleports you upwards a specified distance.',
             syntax: [
                 '#\xa7eup \xa7i<\xa7fdistance\xa7i> [\xa7f-n\xa7i]',
             ],
@@ -653,7 +653,7 @@ let webe = {
         },
         {
             name: 'fixwater',
-            desc: 'Fix water to be stationary.',
+            desc: 'Fixes water to be stationary.',
             syntax: [
                 '#\xa7efixwater \xa7i<\xa7fradius\xa7i>]',
             ],
@@ -691,7 +691,7 @@ let webe = {
         },
         {
             name: 'fixlava',
-            desc: 'Fix lava to be stationary.',
+            desc: 'Fixes lava to be stationary.',
             syntax: [
                 '#\xa7efixlava \xa7i<\xa7fradius\xa7i>',
             ],
@@ -729,7 +729,7 @@ let webe = {
         },
         {
             name: 'drain',
-            desc: 'Drain water/lava.',
+            desc: 'Drains water/lava in a specified radius.',
             syntax: [
                 '#\xa7edrain \xa7i<\xa7fradius\xa7i>',
             ],
@@ -767,7 +767,7 @@ let webe = {
         },
         {
             name: 'set',
-            desc: 'Sets all blocks in the region.',
+            desc: 'Changes all blocks in the region to a specified pattern.',
             syntax: [
                 '#\xa7eset \xa7i<\xa7fpattern\xa7i>',
             ],
@@ -829,7 +829,7 @@ let webe = {
         },
         {
             name: 'walls',
-            desc: 'Build the four sides of the selection.',
+            desc: 'Builds a four-sided wall in the region.',
             syntax: [
                 '#\xa7ewalls \xa7i<\xa7fpattern\xa7i>',
             ],
@@ -862,7 +862,7 @@ let webe = {
         },
         {
             name: 'replace',
-            desc: 'Replace all blocks in the selection with another.',
+            desc: 'Replaces all specific blocks in the region with a specfied pattern.',
             syntax: [
                 '#\xa7ereplace \xa7i<\xa7ffrom\xa7i> <\xa7fto\xa7i>',
             ],
@@ -997,7 +997,7 @@ let webe = {
         },
         {
             name: 'replacenear',
-            desc: 'Replace nearby blocks.',
+            desc: 'Replaces nearby blocks with a specified pattern.',
             syntax: [
                 '#\xa7ereplacenear \xa7i<\xa7fradius\xa7i> \xa7i<\xa7ffrom\xa7i> \xa7i<\xa7fto\xa7i>',
             ],
