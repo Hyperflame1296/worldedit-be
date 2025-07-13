@@ -882,6 +882,11 @@ let webe = {
                         this.send_usage(player);
                         return;
                     }
+                    if (!s.BlockTypes.get(c)) {
+                        player.sendMessage(`\xa7cInvalid value for \xa7i<\xa7ffrom\xa7i>\xa7c, no such block type \xa7f\'\xa7c${c}\xa7f\'.`);
+                        this.send_usage(player);
+                        return;
+                    }
                     if (!player.getDynamicProperty('webe:pos1') || !player.getDynamicProperty('webe:pos2')) {
                         player.sendMessage(`\xa7cMake a region selection first\xa7f.`);
                         return;
@@ -1012,6 +1017,11 @@ let webe = {
                     let h = false;
                     if (!d || d === '') {
                         player.sendMessage('\xa7cMissing argument for \xa7i<\xa7ffrom\xa7i>\xa7c.');
+                        this.send_usage(player);
+                        return;
+                    }
+                    if (!s.BlockTypes.get(d)) {
+                        player.sendMessage(`\xa7cInvalid value for \xa7i<\xa7ffrom\xa7i>\xa7c, no such block type \xa7f\'\xa7c${d}\xa7f\'.`);
                         this.send_usage(player);
                         return;
                     }
