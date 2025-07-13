@@ -353,6 +353,7 @@ let webe = {
             return i;
         },
         replacenear: function(c, r, dimension=s.world.getDimension('minecraft:overworld'), from, to) {
+            to = webe.methods.parse_pattern(to)
             let i = 0;
             for (let x = -r; x <= r; x++) {
                 for (let y = -r; y <= r; y++) {
