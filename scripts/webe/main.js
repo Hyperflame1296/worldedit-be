@@ -11,15 +11,23 @@ let webe = {
     ver: 'worldedit-be v0.1.0 - ncb0.1.0',
     methods: {
         check_op: function(player) { // wrap the operator check, to make things easier
-            if (player.commandPermissionLevel >= 2) return true;
-            return false
+            try {
+                if (player.commandPermissionLevel >= 2) return true;
+                return false
+            } catch (err) {
+                throw new Error(`webe.methods.check_op \xa7f-\xa7c ${err}`);
+            }
         },
         area: function(pos1, pos2) {
-            let width  = Math.abs(pos2.x - pos1.x) + 1
-            let height = Math.abs(pos2.y - pos1.y) + 1
-            let depth  = Math.abs(pos2.z - pos1.z) + 1
+            try {
+                let width  = Math.abs(pos2.x - pos1.x) + 1
+                let height = Math.abs(pos2.y - pos1.y) + 1
+                let depth  = Math.abs(pos2.z - pos1.z) + 1
 
-            return width * height * depth
+                return width * height * depth
+            } catch (err) {
+                throw new Error(`webe.methods.area \xa7f-\xa7c ${err}`);
+            }
         },
         random_entries(entries) {
             let total = 0;
@@ -28,7 +36,7 @@ let webe = {
                 return [total, value];
             });
           
-            if (total <= 0) throw new Error("Total chance must be greater than 0");
+            if (total <= 0) throw new Error('webe.methods.random_entries \xa7f-\xa7c Total chance must be greater than 0. All entries provided had a chance of 0 or less.');
           
             let roll = Math.random() * total;
           
@@ -39,7 +47,7 @@ let webe = {
             return cumulative[cumulative.length - 1][1]; // fallback
         },
         equal_random(entries) {
-            if (!entries.length) throw new Error("No entries provided");
+            if (!entries.length) throw new Error('webe.methods.parse_pattern \xa7f-\xa7c No input strings were provided\xa7f.');
             let index = Math.floor(Math.random() * entries.length);
             return entries[index];
         },
@@ -57,17 +65,17 @@ let webe = {
                         let chance = parseFloat(b.split('%')[0].trim());
                         let block = b.split('%')[1].trim() 
                         if (!s.BlockTypes.get(block))
-                            throw new Error(`Error parsing pattern - Invalid block type \'${block}\'`);
+                            throw new Error(`webe.methods.parse_pattern \xa7f-\xa7c Invalid block type \xa7f\'\xa7c${block}\xa7f\'`);
 
                         if (isNaN(chance) || chance < 0 || chance > 100)
-                            throw new Error(`Error parsing pattern - Invalid chance value \'${chance}\'`);
+                            throw new Error(`webe.methods.parse_pattern \xa7f-\xa7c Invalid chance value \xa7f\'\xa7c${chance}\xa7f\'`);
 
                         return [chance, block];
                     } else {
                         if (s.BlockTypes.get(b)) {
                             return s.BlockTypes.get(b);
                         } else {
-                            throw new Error(`Error parsing pattern - Invalid block type \'${b}\'`);
+                            throw new Error(`webe.methods.parse_pattern \xa7f-\xa7c Invalid block type \xa7f\'\xa7c${b}\xa7f\'`);
                         }
                     }
                 });
@@ -76,7 +84,7 @@ let webe = {
                 if (s.BlockTypes.get(pattern)) {
                     return () => s.BlockTypes.get(pattern);
                 } else {
-                    throw new Error(`Error parsing pattern - Invalid block type \'${pattern}\'`);
+                    throw new Error(`webe.methods.parse_pattern \xa7f-\xa7c Invalid block type \xa7f\'\xa7c${pattern}\xa7f\'`);
                 }
             }
         },
@@ -163,7 +171,7 @@ let webe = {
             let rs2 = (r - 1) ** 2;
             let i = 0;
             if (r < 1) return 0;
-
+            let pos = { x: 0, y: 0, z: 0 }; // reuse, reduce, recycle
             for (let x = -r; x <= r; x++) {
                 for (let y = -r; y <= r; y++) {
                     for (let z = -r; z <= r; z++) {
@@ -177,11 +185,9 @@ let webe = {
                         let bias = (components === 1) ? 0.3 : 0;
 
                         if (!h && ds <= rs - bias || h && ds <= rs - bias && ds >= rs2) {
-                            let pos = {
-                                x: c.x + x,
-                                y: c.y + y,
-                                z: c.z + z
-                            };
+                            pos.x = c.x + x,
+                            pos.y = c.y + y,
+                            pos.z = c.z + z;
                             i += this.setblock(pos, pattern, dimension);
                         }
                     }
@@ -195,7 +201,7 @@ let webe = {
             let rs2 = (r - 1) ** 2;
             let i = 0;
             if (r < 1) return 0;
-
+            let pos = { x: 0, y: 0, z: 0 }; // reuse, reduce, recycle
             for (let x = -r; x <= r; x++) {
                 for (let y = 0; y <= height; y++) {
                     for (let z = -r; z <= r; z++) {
@@ -209,11 +215,9 @@ let webe = {
                         let bias = (components === 1) ? 0.3 : 0;
 
                         if (!h && ds <= rs - bias || h && ds <= rs - bias && ds >= rs2) {
-                            let pos = {
-                                x: c.x + x,
-                                y: c.y + y,
-                                z: c.z + z
-                            };
+                            pos.x = c.x + x,
+                            pos.y = c.y + y,
+                            pos.z = c.z + z;
                             i += this.setblock(pos, pattern, dimension);
                         }
                     }
@@ -225,13 +229,12 @@ let webe = {
             pattern = webe.methods.parse_pattern(pattern)
             if (r < 1) return 0;
             let i = 0;
-
+            let pos = { x: 0, y: 0, z: 0 }; // reuse, reduce, recycle
             for (let y = 0; y <= r; y++) {
                 let size = r - y;
 
                 for (let x = -size; x <= size; x++) {
                     for (let z = -size; z <= size; z++) {
-
                         // Hollow check
                         if (h) {
                             let edge = (
@@ -240,12 +243,9 @@ let webe = {
                             );
                             if (!edge) continue;
                         }
-
-                        let pos = {
-                            x: c.x + x,
-                            y: c.y + y,
-                            z: c.z + z
-                        };
+                        pos.x = c.x + x,
+                        pos.y = c.y + y,
+                        pos.z = c.z + z;
                         i += this.setblock(pos, pattern, dimension);
                     }
                 }
@@ -411,11 +411,12 @@ let webe = {
             desc: 'Shows all of the available commands.',
             syntax: [
                 '#\xa7ehelp \xa7i[\xa7fcommand\xa7i]',
+                '\xa7eArguments\xa7f: ',
+                '    \xa7fcommand\xa7i: \xa7o\xa7i(optional) \xa7r\xa7eThe command to send the info of.'
             ],
             flags: [],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + this.syntax[0] + `\n\xa7eType \xa7f${webe.command_prefix}\xa7ehelp ${this.name} for more info\xa7f.`);
             },
             func: function(a, player) {
                 try {
@@ -425,10 +426,10 @@ let webe = {
                     if (c) {
                         let cmd = webe.commands.find(cmd => `${webe.command_prefix}${cmd.name}` === c || `${cmd.name}` === c);
                         player.sendMessage(`\xa7f${webe.command_prefix}\xa7e${cmd.name}\xa7f - \xa7i\xa7o${cmd.desc}\xa7r`);
-                        cmd.send_usage(player); // send the usage of the command
+                        player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + cmd.syntax.join('\n\xa7r')); // send the usage of the command
                     } else {
                         let msg = '\xa7eCommands\xa7f:'
-                        for (let command of webe.commands.filter(cmd => cmd.requires_op)) {
+                        for (let command of webe.commands) {
                             msg += `\n    \xa7f${webe.command_prefix}\xa7e${command.name} \xa7i- \xa7i\xa7o${command.desc}\xa7r`;
                         }
                         player.sendMessage(`${msg}`);
@@ -445,9 +446,8 @@ let webe = {
                 '#\xa7edeselect',
             ],
             flags: [],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + this.syntax[0] + `\n\xa7eType \xa7f${webe.command_prefix}\xa7ehelp ${this.name} for more info\xa7f.`);
             },
             func: function(a, player) {
                 try {
@@ -468,11 +468,12 @@ let webe = {
             desc: 'Sets the first position.',
             syntax: [
                 '#\xa7epos1 \xa7i[\xa7fx\xa7i] \xa7i[\xa7fy\xa7i] \xa7i[\xa7fz\xa7i]',
+                '\xa7eArguments\xa7f: ',
+                '    \xa7fx\xa7i, \xa7fy\xa7i, \xa7fz\xa7i: \xa7o\xa7i(optional) \xa7r\xa7eThe coordinates to set the position to.'
             ],
             flags: [],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + this.syntax[0] + `\n\xa7eType \xa7f${webe.command_prefix}\xa7ehelp ${this.name} for more info\xa7f.`);
             },
             func: function(a, player) {
                 try {
@@ -520,11 +521,12 @@ let webe = {
             desc: 'Sets the second position.',
             syntax: [
                 '#\xa7epos2 \xa7i[\xa7fx\xa7i] \xa7i[\xa7fy\xa7i] \xa7i[\xa7fz\xa7i]',
+                '\xa7eArguments\xa7f: ',
+                '    \xa7fx\xa7i, \xa7fy\xa7i, \xa7fz\xa7i: \xa7o\xa7i(optional) \xa7r\xa7eThe coordinates to set the position to.'
             ],
             flags: [],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + this.syntax[0] + `\n\xa7eType \xa7f${webe.command_prefix}\xa7ehelp ${this.name} for more info\xa7f.`);
             },
             func: function(a, player) {
                 try {
@@ -573,9 +575,8 @@ let webe = {
                 '#\xa7dwand',
             ],
             flags: [],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + this.syntax[0] + `\n\xa7eType \xa7f${webe.command_prefix}\xa7ehelp ${this.name} for more info\xa7f.`);
             },
             func: function(a, player) {
                 try {
@@ -600,11 +601,14 @@ let webe = {
             desc: 'Teleports you upwards a specified distance.',
             syntax: [
                 '#\xa7eup \xa7i<\xa7fdistance\xa7i> [\xa7f-n\xa7i]',
+                '\xa7eArguments\xa7f: ',
+                '    \xa7fdistance\xa7i: \xa7eHow high to teleport.',
+                '\xa7eFlags\xa7f: ',
+                '    \xa7f-n\xa7i: \xa7eRemoves the glass.',
             ],
             flags: ['-n'],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + this.syntax[0] + `\n\xa7eType \xa7f${webe.command_prefix}\xa7ehelp ${this.name} for more info\xa7f.`);
             },
             func: function(a, player) {
                 try {
@@ -656,11 +660,12 @@ let webe = {
             desc: 'Fixes water to be stationary.',
             syntax: [
                 '#\xa7efixwater \xa7i<\xa7fradius\xa7i>]',
+                '\xa7eArguments\xa7f: ',
+                '    \xa7fradius\xa7i: \xa7eThe size of the area you want to fix. \xa7i\xa7o(spherical)',
             ],
             flags: [],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + this.syntax[0] + `\n\xa7eType \xa7f${webe.command_prefix}\xa7ehelp ${this.name} for more info\xa7f.`);
             },
             func: function(a, player) {
                 try {
@@ -694,11 +699,12 @@ let webe = {
             desc: 'Fixes lava to be stationary.',
             syntax: [
                 '#\xa7efixlava \xa7i<\xa7fradius\xa7i>',
+                '\xa7eArguments\xa7f: ',
+                '    \xa7fradius\xa7i: \xa7eThe size of the area you want to fix. \xa7i\xa7o(spherical)',
             ],
             flags: [],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + this.syntax[0] + `\n\xa7eType \xa7f${webe.command_prefix}\xa7ehelp ${this.name} for more info\xa7f.`);
             },
             func: function(a, player) {
                 try {
@@ -731,12 +737,15 @@ let webe = {
             name: 'drain',
             desc: 'Drains water/lava in a specified radius.',
             syntax: [
-                '#\xa7edrain \xa7i<\xa7fradius\xa7i>',
+                '#\xa7edrain \xa7i<\xa7fradius\xa7i> \xa7i[\xa7f-w\xa7i]',
+                '\xa7eArguments\xa7f: ',
+                '    \xa7fradius\xa7i: \xa7eThe size of the area you want to drain. \xa7i\xa7o(spherical)',
+                '\xa7eFlags\xa7f: ',
+                '    \xa7f-w\xa7i: \xa7eDrain the water from waterlogged blocks as well.',
             ],
             flags: ['-w'],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + this.syntax[0] + `\n\xa7eType \xa7f${webe.command_prefix}\xa7ehelp ${this.name} for more info\xa7f.`);
             },
             func: function(a, player) {
                 try {
@@ -770,28 +779,28 @@ let webe = {
             desc: 'Changes all blocks in the region to a specified pattern.',
             syntax: [
                 '#\xa7eset \xa7i<\xa7fpattern\xa7i>',
+                '\xa7eArguments\xa7f: ',
+                '    \xa7fpattern\xa7i: \xa7eThe pattern to fill the region with. \xa7i\xa7o(patterns cannot contain spaces!)'
             ],
             flags: [],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + this.syntax[0] + `\n\xa7eType \xa7f${webe.command_prefix}\xa7ehelp ${this.name} for more info\xa7f.`);
             },
             func: function(a, player) {
                 try {
                     let
                         b = a[0]?.trim()?.toLowerCase(),
-                        c = a[1]?.trim()?.toLowerCase(),
-                        input = a.slice(1).join(' ');
-                    if (!input || input === '') {
+                        c = a[1]?.trim()?.toLowerCase()
+                    if (!c || c === '') {
                         player.sendMessage('\xa7cMissing argument for \xa7i<\xa7fpattern\xa7i>\xa7c.');
                         this.send_usage(player);
                         return;
                     }
                     if (!player.getDynamicProperty('webe:pos1') || !player.getDynamicProperty('webe:pos2')) {
-                        player.sendMessage(`\xa7cMake a region selection first\xa7f.`);
+                        player.sendMessage(`\xa7cSelect a region first\xa7f.`);
                         return;
                     }
-                    let aff = webe.methods.fill(player.getDynamicProperty('webe:pos1'), player.getDynamicProperty('webe:pos2'), input, player.dimension); // fill the region with the pattern
+                    let aff = webe.methods.fill(player.getDynamicProperty('webe:pos1'), player.getDynamicProperty('webe:pos2'), c, player.dimension); // fill the region with the pattern
                     player.sendMessage(`\xa7eOperation completed\xa7f \xa7f(\xa7e${aff} blocks affected\xa7f).`);
                 } catch (e) {
                     player.sendMessage(`\xa7cERROR \xa7f- \xa7c${e.message}`); // send an error message to the player
@@ -805,22 +814,16 @@ let webe = {
                 '#\xa7edel',
             ],
             flags: [],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + this.syntax[0] + `\n\xa7eType \xa7f${webe.command_prefix}\xa7ehelp ${this.name} for more info\xa7f.`);
             },
             func: function(a, player) {
                 try {
-                    let
-                        b = a[0]?.trim()?.toLowerCase(),
-                        c = a[1]?.trim()?.toLowerCase(),
-                        input = a.slice(1).join(' ');
-
                     if (!player.getDynamicProperty('webe:pos1') || !player.getDynamicProperty('webe:pos2')) {
-                        player.sendMessage(`\xa7cMake a region selection first\xa7f.`);
+                        player.sendMessage(`\xa7cSelect a region first\xa7f.`);
                         return;
                     }
-                    let aff = webe.methods.del(player.getDynamicProperty('webe:pos1'), player.getDynamicProperty('webe:pos2'), player.dimension); // fill the region with the pattern
+                    let aff = webe.methods.del(player.getDynamicProperty('webe:pos1'), player.getDynamicProperty('webe:pos2'), player.dimension); // remove the region
                     player.sendMessage(`\xa7eOperation completed\xa7f \xa7f(\xa7e${aff} blocks removed\xa7f).`);
                 } catch (e) {
                     player.sendMessage(`\xa7cERROR \xa7f- \xa7c${e.message}`); // send an error message to the player
@@ -832,11 +835,12 @@ let webe = {
             desc: 'Builds a four-sided wall in the region.',
             syntax: [
                 '#\xa7ewalls \xa7i<\xa7fpattern\xa7i>',
+                '\xa7eArguments\xa7f: ',
+                '    \xa7fpattern\xa7i: \xa7eThe pattern to fill the walls with. \xa7i\xa7o(patterns cannot contain spaces!)'
             ],
             flags: [],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + this.syntax[0] + `\n\xa7eType \xa7f${webe.command_prefix}\xa7ehelp ${this.name} for more info\xa7f.`);
             },
             func: function(a, player) {
                 try {
@@ -850,7 +854,7 @@ let webe = {
                         return;
                     }
                     if (!player.getDynamicProperty('webe:pos1') || !player.getDynamicProperty('webe:pos2')) {
-                        player.sendMessage(`\xa7cMake a region selection first\xa7f.`);
+                        player.sendMessage(`\xa7cSelect a region first\xa7f.`);
                         return;
                     }
                     let aff = webe.methods.walls(player.getDynamicProperty('webe:pos1'), player.getDynamicProperty('webe:pos2'), input, player.dimension); // fill the region with the pattern
@@ -865,11 +869,14 @@ let webe = {
             desc: 'Replaces all specific blocks in the region with a specfied pattern.',
             syntax: [
                 '#\xa7ereplace \xa7i<\xa7ffrom\xa7i> <\xa7fto\xa7i>',
+                '\xa7eArguments\xa7f: ',
+                '    \xa7fradius\xa7i: \xa7eThe size of the area you want to drain. \xa7i\xa7o(cubic)',
+                '    \xa7ffrom\xa7i: \xa7eThe block type to replace.',
+                '    \xa7fto\xa7i: \xa7eThe pattern to replace \xa7ffrom\xa7e the region with. \xa7i\xa7o(patterns cannot contain spaces!)',
             ],
             flags: [],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n\xa7r'));
             },
             func: function(a, player) {
                 try {
@@ -888,7 +895,7 @@ let webe = {
                         return;
                     }
                     if (!player.getDynamicProperty('webe:pos1') || !player.getDynamicProperty('webe:pos2')) {
-                        player.sendMessage(`\xa7cMake a region selection first\xa7f.`);
+                        player.sendMessage(`\xa7cSelect a region first\xa7f.`);
                         return;
                     }
                     let aff = webe.methods.replace(player.getDynamicProperty('webe:pos1'), player.getDynamicProperty('webe:pos2'), c, input, player.dimension); // fill the region with the pattern
@@ -903,11 +910,15 @@ let webe = {
             desc: 'Generates a sphere.',
             syntax: [
                 '#\xa7esphere \xa7i<\xa7fpattern\xa7i> \xa7i<\xa7fradius\xa7i> \xa7i[\xa7f-h\xa7i]',
+                '\xa7eArguments\xa7f: ',
+                '    \xa7fpattern\xa7i: \xa7eThe pattern to fill the sphere with.',
+                '    \xa7fradius\xa7i: \xa7eThe size of the sphere.',
+                '\xa7eFlags\xa7f: ',
+                '    \xa7f-h\xa7i: \xa7eMake the sphere hollow.',
             ],
             flags: ['-h'],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + this.syntax[0] + `\n\xa7eType \xa7f${webe.command_prefix}\xa7ehelp ${this.name} for more info\xa7f.`);
             },
             func: function(a, player) {
                 try {
@@ -946,11 +957,16 @@ let webe = {
             desc: 'Generates a cylinder.',
             syntax: [
                 '#\xa7ecyl \xa7i<\xa7fpattern\xa7i> \xa7i<\xa7fradius\xa7i> \xa7i<\xa7fheight\xa7i> \xa7i[\xa7f-h\xa7i]',
+                '\xa7eArguments\xa7f: ',
+                '    \xa7fpattern\xa7i: \xa7eThe pattern to fill the cylinder with.',
+                '    \xa7fradius\xa7i: \xa7eThe size of the cylinder.',
+                '    \xa7fheight\xa7i: \xa7eThe height of the cylinder.',
+                '\xa7eFlags\xa7f: ',
+                '    \xa7f-h\xa7i: \xa7eMake the cylinder hollow.',
             ],
             flags: ['-h'],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + this.syntax[0] + `\n\xa7eType \xa7f${webe.command_prefix}\xa7ehelp ${this.name} for more info\xa7f.`);
             },
             func: function(a, player) {
                 try {
@@ -1000,11 +1016,12 @@ let webe = {
             desc: 'Replaces nearby blocks with a specified pattern.',
             syntax: [
                 '#\xa7ereplacenear \xa7i<\xa7fradius\xa7i> \xa7i<\xa7ffrom\xa7i> \xa7i<\xa7fto\xa7i>',
+                '    \xa7ffrom\xa7i: \xa7eThe block type to replace.',
+                '    \xa7fto\xa7i: \xa7eThe pattern to replace \xa7ffrom\xa7e the region with. \xa7i\xa7o(patterns cannot contain spaces!)',
             ],
             flags: ['-h'],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + this.syntax[0] + `\n\xa7eType \xa7f${webe.command_prefix}\xa7ehelp ${this.name} for more info\xa7f.`);
             },
             func: function(a, player) {
                 try {
@@ -1053,11 +1070,15 @@ let webe = {
             desc: 'Generates a pyramid.',
             syntax: [
                 '#\xa7epyramid \xa7i<\xa7fpattern\xa7i> \xa7i<\xa7fsize\xa7i> \xa7i[\xa7f-h\xa7i]',
+                '\xa7eArguments\xa7f: ',
+                '    \xa7fpattern\xa7i: \xa7eThe pattern to fill the pyramid with.',
+                '    \xa7fsize\xa7i: \xa7eThe height/size of the pyramid.',
+                '\xa7eFlags\xa7f: ',
+                '    \xa7f-h\xa7i: \xa7eMake the pyramid hollow.',
             ],
             flags: ['-h'],
-            requires_op: true,
             send_usage: function(player) {
-                player.sendMessage('\xa7eUsage\xa7f: \n    ' + this.syntax.join('\n'));
+                player.sendMessage('\xa7eUsage\xa7f: \n\xa7r    ' + this.syntax[0] + `\n\xa7eType \xa7f${webe.command_prefix}\xa7ehelp ${this.name} for more info\xa7f.`);
             },
             func: function(a, player) {
                 try {
@@ -1154,7 +1175,7 @@ let webe = {
         after_events: {
             playerSpawn: function(e) {
                 // runs when a player spawns
-                if (e.initialSpawn && e.player.commandPermissionLevel >= 2) {
+                if (e.initialSpawn && webe.methods.check_op(player) && e.player.getGameMode() === 'Creative') {
                     e.player.sendMessage(`\xa7eWelcome\xa7f! \xa7eType \xa7f${webe.command_prefix}\xa7ehelp to see WorldEdit commands\xa7f!`)
                 }
             }
