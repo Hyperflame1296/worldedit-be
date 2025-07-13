@@ -89,10 +89,9 @@ let webe = {
             }
         },
         setblock: function(pos, pattern, dimension) {
-            let p = pattern;
             if (pos.y < -64 || pos.y > 319) return 0;
             let b = dimension.getBlock(pos);
-            let type = p()
+            let type = pattern()
             if (b && (s.BlockTypes.get(b.type.id) !== type)) {
                 b.setType(type);
                 return 1;
@@ -1175,7 +1174,7 @@ let webe = {
         after_events: {
             playerSpawn: function(e) {
                 // runs when a player spawns
-                if (e.initialSpawn && webe.methods.check_op(player) && e.player.getGameMode() === 'Creative') {
+                if (e.initialSpawn && webe.methods.check_op(e.player) && e.player.getGameMode() === 'Creative') {
                     e.player.sendMessage(`\xa7eWelcome\xa7f! \xa7eType \xa7f${webe.command_prefix}\xa7ehelp to see WorldEdit commands\xa7f!`)
                 }
             }
